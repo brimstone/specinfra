@@ -3,8 +3,8 @@ module Specinfra
     def self.method_missing(meth, *args)
       backend   = Specinfra.backend
       processor = Specinfra::Processor
-      
-      if ! os.include?(:family) || os[:family] != 'windows'
+
+      if !os.include?(:family) || os[:family] != 'windows'
         if processor.respond_to?(meth)
           processor.send(meth, *args)
         elsif backend.respond_to?(meth)
@@ -22,9 +22,11 @@ module Specinfra
     end
 
     private
+
     def self.run(meth, *args)
       cmd = Specinfra.command.get(meth, *args)
       ret = Specinfra.backend.run_command(cmd)
+      print "\nCommand: #{cmd} returned #{ret.exit_status}\n#{ret.stdout}\n#{ret.stderr}\n" unless ret.success?
       if meth.to_s =~ /^check/
         ret.success?
       else
